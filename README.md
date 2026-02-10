@@ -16,14 +16,6 @@ npm run dev
 
 Open: `http://localhost:3000/admin`
 
-## .env
-Create a `.env` file in the root:
-
-```env
-PORT=3000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/assignment1_db?retryWrites=true&w=majority&appName=Cluster0
-```
-
 ## Main Routes
 - `/admin` dashboard
 - `/admin/services` manage services
@@ -31,8 +23,3 @@ MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/assignment1_db?ret
 - `/api/services` services JSON
 - `/api/team-members` team members JSON
 
-## Seed Data
-Use the queries in `database-queries.md` in MongoDB Atlas (Playground or Data Explorer shell).
-
-## Deploy
-Add your deployed URL here when ready.
