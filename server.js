@@ -50,7 +50,9 @@ mongoose
   });
 
 app.get('/', (_req, res) => {
-  res.redirect('/admin');
+  res.render('home', {
+    pageTitle: 'Home'
+  });
 });
 
 app.get('/login', (req, res) => {
