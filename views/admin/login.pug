@@ -1,0 +1,29 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title= pageTitle
+    link(rel='preconnect' href='https://fonts.googleapis.com')
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+    link(href='https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap' rel='stylesheet')
+    link(rel='stylesheet' href='/css/styles.css')
+  body
+    .page-shell.auth-shell
+      main.login-card
+        h1 Admin Login
+        p Sign in to access the admin dashboard.
+
+        if errorMessage
+          p.form-error= errorMessage
+
+        form.form-stack(action='/login' method='POST')
+          label(for='username') Username
+          input#username(name='username' type='text' required)
+
+          label(for='password') Password
+          input#password(name='password' type='password' required)
+
+          button.btn(type='submit') Login
+
+        p.hint Default login for assignment: admin / admin123

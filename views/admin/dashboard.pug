@@ -18,6 +18,8 @@ html(lang='en')
         a.btn-link.active(href='/admin') Dashboard
         a.btn-link(href='/admin/services') Services
         a.btn-link(href='/admin/team-members') Team Members
+        form.inline-form(action='/logout' method='POST')
+          button.btn.btn-outline(type='submit') Logout
 
       main.content
         section.panel-grid
