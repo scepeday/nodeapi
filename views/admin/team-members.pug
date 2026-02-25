@@ -1,0 +1,48 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title= pageTitle
+    link(rel='preconnect' href='https://fonts.googleapis.com')
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+    link(href='https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap' rel='stylesheet')
+    link(rel='stylesheet' href='/css/styles.css')
+  body
+    .page-shell
+      header.hero.small
+        h1 Manage Team Members
+        p Create and remove team records.
+
+      nav.top-nav
+        a.btn-link(href='/admin') Dashboard
+        a.btn-link(href='/admin/services') Services
+        a.btn-link.active(href='/admin/team-members') Team Members
+
+      main.content.two-col
+        section.panel
+          h2 Add Team Member
+          form.form-stack(action='/admin/team-members' method='POST')
+            label(for='fullName') Full Name
+            input#fullName(name='fullName' type='text' required)
+
+            label(for='role') Role
+            input#role(name='role' type='text' required)
+
+            label(for='email') Email
+            input#email(name='email' type='email' required)
+
+            button.btn(type='submit') Add Team Member
+
+        section.panel
+          h2 Current Team Members
+          if !teamMembers.length
+            p.empty No team members added yet.
+
+          each member in teamMembers
+            article.record
+              h3= member.fullName
+              p.meta= `Role: ${member.role}`
+              p.meta= `Email: ${member.email}`
+              form(action=`/admin/team-members/${member._id}/delete` method='POST')
+                button.btn.btn-danger(type='submit') Delete

@@ -1,0 +1,39 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title= pageTitle
+    link(rel='preconnect' href='https://fonts.googleapis.com')
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+    link(href='https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap' rel='stylesheet')
+    link(rel='stylesheet' href='/css/styles.css')
+  body
+    .page-shell
+      header.hero
+        h1 Studio Admin Dashboard
+        p Manage collection data and access API endpoints from one place.
+
+      nav.top-nav
+        a.btn-link.active(href='/admin') Dashboard
+        a.btn-link(href='/admin/services') Services
+        a.btn-link(href='/admin/team-members') Team Members
+
+      main.content
+        section.panel-grid
+          article.panel
+            h2 Services
+            p Add or delete service records for your API data.
+            a.btn(href='/admin/services') Open Services Admin
+
+          article.panel
+            h2 Team Members
+            p Add or delete team members used by your API.
+            a.btn(href='/admin/team-members') Open Team Members Admin
+
+          article.panel
+            h2 API Preview
+            p Open JSON endpoints in a new tab.
+            .stack
+              a.btn.btn-outline(href='/api/services' target='_blank') /api/services
+              a.btn.btn-outline(href='/api/team-members' target='_blank') /api/team-members

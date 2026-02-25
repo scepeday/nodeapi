@@ -1,0 +1,48 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title= pageTitle
+    link(rel='preconnect' href='https://fonts.googleapis.com')
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+    link(href='https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap' rel='stylesheet')
+    link(rel='stylesheet' href='/css/styles.css')
+  body
+    .page-shell
+      header.hero.small
+        h1 Manage Services
+        p Create and remove service records.
+
+      nav.top-nav
+        a.btn-link(href='/admin') Dashboard
+        a.btn-link.active(href='/admin/services') Services
+        a.btn-link(href='/admin/team-members') Team Members
+
+      main.content.two-col
+        section.panel
+          h2 Add Service
+          form.form-stack(action='/admin/services' method='POST')
+            label(for='name') Service Name
+            input#name(name='name' type='text' required)
+
+            label(for='description') Description
+            textarea#description(name='description' rows='4' required)
+
+            label(for='price') Price (CAD)
+            input#price(name='price' type='number' min='0' step='0.01' required)
+
+            button.btn(type='submit') Add Service
+
+        section.panel
+          h2 Current Services
+          if !services.length
+            p.empty No services added yet.
+
+          each service in services
+            article.record
+              h3= service.name
+              p= service.description
+              p.meta= `Price: $${service.price.toFixed(2)}`
+              form(action=`/admin/services/${service._id}/delete` method='POST')
+                button.btn.btn-danger(type='submit') Delete
