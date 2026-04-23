@@ -1,7 +1,7 @@
 {
   "name": "assignment01-admin-api",
   "version": "1.0.0",
-  "description": "Express admin dashboard with MongoDB collections and JSON API endpoints",
+  "description": "Hidden Thoughts ecommerce catalog API with an Express admin dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,7 +11,8 @@
     "express",
     "mongodb",
     "pug",
-    "api"
+    "api",
+    "ecommerce"
   ],
   "author": "",
   "license": "ISC",

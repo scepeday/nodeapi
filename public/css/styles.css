@@ -111,7 +111,8 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   font: inherit;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -165,6 +166,39 @@ textarea {
 
 .record h3 {
   margin: 0 0 0.4rem;
+}
+
+.record-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 0.75rem;
+  background: #eef4f7;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-row input {
+  width: auto;
+}
+
+.badge {
+  display: inline-block;
+  margin: 0.45rem 0;
+  border: 1px solid #ffd43b;
+  background: #fff9db;
+  color: #5f3f00;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 800;
 }
 
 .meta {

@@ -4,8 +4,7 @@ const path = require('path');
 const session = require('express-session');
 require('dotenv').config();
 
-const Service = require('./models/Service');
-const TeamMember = require('./models/TeamMember');
+const Product = require('./models/Product');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,10 +12,23 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://<username>:<passwo
 const SESSION_SECRET = process.env.SESSION_SECRET || 'student-admin-secret';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '*';
+const PRODUCT_CATEGORIES = ['Clothing', 'Accessories', 'Photography Prints', 'Design Goods', 'Creative Tools'];
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,6 +48,29 @@ function requireAdminLogin(req, res, next) {
   res.redirect('/login');
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildProductQuery(queryParams) {
+  const query = {};
+
+  if (queryParams.category) {
+    query.category = queryParams.category;
+  }
+
+  if (queryParams.featured === 'true') {
+    query.featured = true;
+  }
+
+  if (queryParams.search) {
+    const searchRegex = new RegExp(escapeRegExp(queryParams.search), 'i');
+    query.$or = [{ name: searchRegex }, { description: searchRegex }, { category: searchRegex }];
+  }
+
+  return query;
+}
+
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
@@ -51,7 +86,7 @@ mongoose
 
 app.get('/', (_req, res) => {
   res.render('home', {
-    pageTitle: 'Home'
+    pageTitle: 'Hidden Thoughts API'
   });
 });
 
@@ -88,94 +123,73 @@ app.use('/admin', requireAdminLogin);
 
 app.get('/admin', (_req, res) => {
   res.render('admin/dashboard', {
-    pageTitle: 'Admin Dashboard'
+    pageTitle: 'Hidden Thoughts Admin'
   });
 });
 
-app.get('/admin/services', async (_req, res) => {
+app.get('/admin/products', async (_req, res) => {
   try {
-    const services = await Service.find().sort({ createdAt: -1 });
-    res.render('admin/services', {
-      pageTitle: 'Manage Services',
-      services
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.render('admin/products', {
+      pageTitle: 'Manage Products',
+      products,
+      categories: PRODUCT_CATEGORIES
     });
   } catch (error) {
-    res.status(500).send('Unable to load services.');
+    res.status(500).send('Unable to load products.');
   }
 });
 
-app.post('/admin/services', async (req, res) => {
+app.post('/admin/products', async (req, res) => {
   try {
-    const { name, description, price } = req.body;
-    await Service.create({
+    const { name, description, price, category, imageUrl, stock, featured } = req.body;
+    await Product.create({
       name,
       description,
-      price: Number(price)
+      price: Number(price),
+      category,
+      imageUrl,
+      stock: Number(stock),
+      featured: featured === 'true'
     });
-    res.redirect('/admin/services');
+    res.redirect('/admin/products');
   } catch (error) {
-    res.status(400).send('Unable to create service.');
+    res.status(400).send('Unable to create product.');
   }
 });
 
-app.post('/admin/services/:id/delete', async (req, res) => {
+app.post('/admin/products/:id/delete', async (req, res) => {
   try {
-    await Service.findByIdAndDelete(req.params.id);
-    res.redirect('/admin/services');
+    await Product.findByIdAndDelete(req.params.id);
+    res.redirect('/admin/products');
   } catch (error) {
-    res.status(400).send('Unable to delete service.');
+    res.status(400).send('Unable to delete product.');
   }
 });
 
-app.get('/admin/team-members', async (_req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
-    const teamMembers = await TeamMember.find().sort({ createdAt: -1 });
-    res.render('admin/team-members', {
-      pageTitle: 'Manage Team Members',
-      teamMembers
-    });
+    const products = await Product.find(buildProductQuery(req.query)).sort({ featured: -1, createdAt: -1 });
+    res.json(products);
   } catch (error) {
-    res.status(500).send('Unable to load team members.');
+    res.status(500).json({ message: 'Unable to fetch products.' });
   }
 });
 
-app.post('/admin/team-members', async (req, res) => {
+app.get('/api/products/:id', async (req, res) => {
   try {
-    const { fullName, role, email } = req.body;
-    await TeamMember.create({
-      fullName,
-      role,
-      email
-    });
-    res.redirect('/admin/team-members');
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found.' });
+    }
+
+    res.json(product);
   } catch (error) {
-    res.status(400).send('Unable to create team member.');
+    res.status(400).json({ message: 'Unable to fetch product.' });
   }
 });
 
-app.post('/admin/team-members/:id/delete', async (req, res) => {
-  try {
-    await TeamMember.findByIdAndDelete(req.params.id);
-    res.redirect('/admin/team-members');
-  } catch (error) {
-    res.status(400).send('Unable to delete team member.');
-  }
-});
-
-app.get('/api/services', async (_req, res) => {
-  try {
-    const services = await Service.find().sort({ createdAt: -1 });
-    res.json(services);
-  } catch (error) {
-    res.status(500).json({ message: 'Unable to fetch services.' });
-  }
-});
-
-app.get('/api/team-members', async (_req, res) => {
-  try {
-    const teamMembers = await TeamMember.find().sort({ createdAt: -1 });
-    res.json(teamMembers);
-  } catch (error) {
-    res.status(500).json({ message: 'Unable to fetch team members.' });
-  }
+app.get('/api/categories', (_req, res) => {
+  res.json(PRODUCT_CATEGORIES);
 });
